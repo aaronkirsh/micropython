@@ -1,5 +1,5 @@
 # DHT11/DHT22 asynchronos driver for MicroPython
-# MIT license; Copyright (c) 2016 Damien P. George
+# Aaron Kirschen
 
 from dht import DHT11 as _DHT11
 from dht import DHT22 as _DHT22
