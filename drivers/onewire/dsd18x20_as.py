@@ -1,10 +1,11 @@
-# DS18x20 temperature sensor driver child-class for MicroPython using uasyncio to achieve 'asynchronous' operation
+# DS18x20 temperature sensor driver child-class for MicroPython using uasyncio to achieve asynchronous operation
 #   Aaron Kirschen
 
 from ds18x20 import DS18X20 as _DS18X20
 import uasyncio as asyncio # micropython-async v3 (https://github.com/peterhinch/micropython-async/blob/master/v3/)
 import logging
 log = logging.getLogger(__name__)
+
 
 class DS18X20(_DS18X20):
     def __init__(self, onewire, readDelay=2, unit='F', callback=None):
@@ -25,7 +26,7 @@ class DS18X20(_DS18X20):
         log.debug(measurement)
 
     # Measure temperature continuously
-    async def _run(self, read_delay):
+    async def _run(self, readDelay):
         while True:
             try:
                 # If we have a sensor to read
@@ -52,7 +53,7 @@ class DS18X20(_DS18X20):
                     try: await self.callback(self.temperature)
                     except: self.callback(self.temperature)
                 # Wait between readings    
-                await asyncio.sleep(read_delay)
+                await asyncio.sleep(readDelay)
             except Exception as e:
                 log.error('Error while measuring DS18X20 temperature:\n {}'.format(e))
 
