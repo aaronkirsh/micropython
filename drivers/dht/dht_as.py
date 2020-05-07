@@ -1,5 +1,5 @@
 # DHT11/DHT22 asynchronos driver for MicroPython
-# Aaron Kirschen
+# MIT license; Copyright (c) 2016 Damien P. George
 
 from dht import DHT11 as _DHT11
 from dht import DHT22 as _DHT22
@@ -55,11 +55,10 @@ class DHT11(_DHT11):
         except: return [1.8*temp + 32 for temp in tempC]
 
 
-class DHT22(_DHT22):
-    def __init__(self, pin, readDelay=2, unit='F',callback=None):
+class DHT11(_DHT22):
+    def __init__(self, pin, readDelay=2, callback=None):
         self.pin = pin
         self.readDelay = readDelay
-        self.unit = unit        
         self.temperature = None
         self.humidity = None
         self.callback = callback
@@ -78,21 +77,14 @@ class DHT22(_DHT22):
     async def _run(self, readDelay):
         while True:
             try:
-                temperature = self.temperature()
-                humidity = self.humidity()
-                if (isinstance(temperature, float) and isinstance(humidity, float)) or (isinstance(temperature, int) and isinstance(humidity, int)):
-                    self.temperature = temperature
-                    self.humidity = humidity
-                    # temp = (b'{0:3.1f},'.format(temp))
-                    # hum =  (b'{0:3.1f},'.format(hum))
-                    # Run the callback
-                    try: await self.callback(self.temperature)
-                    except: self.callback(self.temperature)
-                else: log.error('Invalid temperature/humidity fetched from DHT sensor!')
+                self.temperature = self.temperature()
+                self.humidity = self.humidity()
+                # Run the callback
+                try: await self.callback(self.temperature)
+                except: self.callback(self.temperature)
                 await asyncio.sleep(readDelay)
             except Exception as e:
                 log.error('Error while fetching from DHT sensor buffer:\n {}'.format(e))        
-
 
     # Measure from sensor continously
     async def _measure(self,readDelay=2):
@@ -103,7 +95,7 @@ class DHT22(_DHT22):
                 self.measure()
                 await asyncio.sleep(readDelay)
             except Exception as e:
-                log.error('Error while measuring from DHT sensor:\n {}'.format(e))        
+                log.error('Error while measuring from DHT sensor:\n {}'.format(e))      
 
     def convertToF(self,tempC):
         try:    return 1.8*tempC + 32
